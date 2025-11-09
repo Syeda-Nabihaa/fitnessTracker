@@ -4,8 +4,9 @@ import Login from "./pages/auth/Login";
 import { SidebarComponent } from "./components/SideBar";
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/dashboard/Home";
-import Workout from "./pages/dashboard/Workout";
 import FirstPage from "./pages/FirstPage";
+import ViewWorkout from "./pages/dashboard/Workout/ViewWorkout";
+import Workout from "./pages/dashboard/Workout/Workout";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route element={<SidebarComponent />}>
           <Route path="/home" element={<Home />} />
           <Route path="/workout" element={<Workout />} />
+          <Route path="/workout/:id" element={<ViewWorkout />} />
         </Route>
       </Routes>
 
