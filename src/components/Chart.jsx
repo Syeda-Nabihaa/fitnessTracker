@@ -11,6 +11,7 @@ import {
   Bar,
 } from "recharts";
 import { workoutService } from "../service/WorkoutService";
+import { NutritionService } from "../service/NutritionService";
 
 export function WorkoutChart() {
   const services = new workoutService();
@@ -60,26 +61,40 @@ export function WorkoutChart() {
 }
 
 export function CalorieChart() {
-  const calorieData = [
-    { day: "Mon", calories: 1800 },
-    { day: "Tue", calories: 2100 },
-    { day: "Wed", calories: 2000 },
-    { day: "Thu", calories: 1900 },
-    { day: "Fri", calories: 2300 },
-    { day: "Sat", calories: 2500 },
-    { day: "Sun", calories: 1700 },
-  ];
+  const services = new  NutritionService()
+  const [nutrition , setNutrition] = useState([])
+ async function AllNutrition() {
+    try {
+      const response = await services.AllNutrition();
+      console.log("API Response:", response.nutrition); // <-- check structure
+      setNutrition(response?.nutrition ?? []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+  useEffect(() => {
+    AllNutrition();
+  }, []);
+
+const mealData = nutrition
+  .flatMap(n => n.meals || [])
+  .map(meal => ({
+    name: meal.mealType,
+    value: meal.items?.length || 0, // number of food items per meal
+  }));
+
   return (
     <div className="bg-white p-6 rounded-xl shadow h-64">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={calorieData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="day" />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="calories" fill="#f97316" />
-        </BarChart>
-      </ResponsiveContainer>
+  <BarChart data={mealData}>
+  <CartesianGrid strokeDasharray="1 1" />
+  <XAxis dataKey="name" />
+  <YAxis />
+  <Tooltip />
+  <Bar dataKey="value" fill="#f97316" />
+</BarChart>
+</ResponsiveContainer>
+
     </div>
   );
 }

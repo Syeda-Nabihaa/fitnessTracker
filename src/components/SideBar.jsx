@@ -14,7 +14,7 @@ import { motion } from "framer-motion";
 import { cn } from "../lib/Utils";
 import { Outlet } from "react-router-dom";
 
-export function SidebarComponent({children}) {
+export function SidebarComponent() {
   const links = [
     {
       label: "Dashboard",

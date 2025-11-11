@@ -11,12 +11,20 @@ export const allApiEndPoints = {
   updateWorkout: `${environment.baseURL}workout`,
   deleteWorkout: `${environment.baseURL}workout`,
 
-  
-  
-  
 
-  
+  // -----------------NUTRITION ENDPOINTS -----------------------------
 
-  
+    createNutrition: `${environment.baseURL}createnutrition`,
+    getAllNutrition: `${environment.baseURL}nutrition`,
+    getNutritionById: `${environment.baseURL}nutrition`,
+    deleteNutrition: `${environment.baseURL}nutrition`,
+
+
+
+
+
+
+
+
 
 };

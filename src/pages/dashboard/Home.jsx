@@ -1,23 +1,63 @@
 import { Link } from "react-router-dom";
 import { Cards } from "../../components/Cards";
 import { CalorieChart, WorkoutChart } from "../../components/Chart";
+import { workoutService } from "../../service/WorkoutService";
+import { useEffect, useState } from "react";
+import { NutritionService } from "../../service/NutritionService";
 
 export default function Home() {
+  const [workouts, setworkouts] = useState([]);
+
+  const workoutservices = new workoutService();
+  const nutritionservices = new NutritionService();
+
+const [nutrition, setNutrition] = useState([]);
+  async function AllNutrition() {
+    try {
+      const response = await nutritionservices.AllNutrition();
+      console.log("API Response:", response.nutrition); // <-- check structure
+      setNutrition(response?.nutrition ?? []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+  useEffect(() => {
+    AllNutrition();
+  }, []);
+function getTotal(nutrient) {
+  return nutrition
+    .flatMap(n => n.meals || [])         // loop through all meals from all nutrition entries
+    .flatMap(meal => meal.items || [])   // flatten all items inside those meals
+    .reduce((sum, item) => sum + Number(item[nutrient] || 0), 0); // sum up the nutrient
+}
+
+const totalCalories = getTotal("calories");
+  async function AllWorkouts() {
+    try {
+      const response = await workoutservices.AllWorkouts();
+      console.log("API Response:", response.workouts); // <-- check structure
+      setworkouts(response?.workouts ?? []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+  useEffect(() => {
+    AllWorkouts();
+  }, []);
   const data = [
     {
       title: "Total Workouts",
-      progress: 24,
+      progress: workouts.length,
     },
     {
       title: "Calories Burned",
-      progress: "14,520 kcal",
+      progress: totalCalories,
     },
     {
       title: "Avg Workout / Week",
       progress: 4,
     },
   ];
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -42,30 +82,30 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Recent Activity */}
-      <div className="bg-white p-6 rounded-xl shadow">
-        <h3 className="text-lg font-semibold mb-4">Recent Workouts</h3>
-        <ul className="space-y-2">
-          <li className="flex justify-between border-b pb-2">
-            <span>🏋️‍♂️ Chest Day Workout</span>
-            <span className="text-sm text-gray-500">2 hrs ago</span>
-          </li>
-          <li className="flex justify-between border-b pb-2">
-            <span>🚴 Cardio Session</span>
-            <span className="text-sm text-gray-500">Yesterday</span>
-          </li>
-          <li className="flex justify-between">
-            <span>🦵 Leg Day Workout</span>
-            <span className="text-sm text-gray-500">2 days ago</span>
-          </li>
-        </ul>
+      {workouts.length > 0 ?  (
+        <div className="bg-white p-6 rounded-xl shadow">
+          <h3 className="text-lg font-semibold mb-4">Recent Workouts</h3>
 
-        <div className="text-right mt-4">
-          <Link to="/workout" className="text-blue-600 hover:underline">
-            View all workouts →
-          </Link>
+          <ul className="space-y-2">
+            {workouts.slice(0,3).map((w) => (
+              <>
+                <li className="flex justify-between border-b pb-2">
+                  <span>{w.category}</span>
+                  <span className="text-sm text-gray-500">{w.date}</span>
+                </li>
+              </>
+            ))}
+          </ul>
+
+          <div className="text-right mt-4">
+            <Link to="/workout" className="text-blue-600 hover:underline">
+              View all workouts →
+            </Link>
+          </div>
         </div>
-      </div>
+      ) : (
+        <p>No recent Workouts</p>
+      )}
     </div>
   );
 }
